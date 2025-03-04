@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Pedidos</title>
+    <style>
+        /*  Configuración general */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /*  Contenedor principal */
+        #container {
+            display: flex;  /* Usamos flexbox en lugar de grid */
+            justify-content: space-between;  /* Espacio entre las tres zonas */
+            padding: 20px;
+            height: 100vh;  /* Ocupar toda la pantalla */
+        }
+
+        /* Estilos generales de cada zona */
+        .zona {
+            background: #FFF44F;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            width: 32%; /* Cada zona ocupa 32% del ancho */
+            overflow-y: auto; /* Permite desplazamiento si el contenido es grande */
+        }
+
+        /*  Títulos */
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* 5️ Listas de selección */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        /* Checkbox y radio buttons */
+        input[type="checkbox"], input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        /*  Campos de entrada y botones */
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /*  Botón de enviar pedido */
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #27aea5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #21918a6a;
+        }
+        .productos {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+
+        .producto {
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            padding: 5px;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, border 0.3s;
+        }
+
+        .producto img {
+            width: 120px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .producto:hover {
+            transform: scale(1.05);
+        }
+
+        .seleccionado {
+            border: 3px solid #27aea5;
+            background-color: rgba(39, 174, 96, 0.2);
+        }
+
+    </style>
+
+    <script type="text/javascript">
+        var contador=0 // Contador para el número de pedido
+
+        // Función para añadir un pedido a la zona de display
+        function añadirPedido(){
+            contador +=1
+
+            // Variables con las distintas zonas dentro de la zona de display
+            let pedidosConfirmados=document.getElementById("pedidosConfirmados")
+            let pedidosPreparacion=document.getElementById("pedidosPreparacion")
+            let pedidosListos=document.getElementById("pedidosListos")
+
+            // Variables para obtener el tiempo de preparación de cada pedido
+            let numeroAleatorio=parseInt(Math.random() * 20 + 1)
+            let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
+            let tiempoPedido= tiempoTotal // Variable que estoy utilizando para actualizar el tiempo en el setInterval (estoy probando xddd)
+        
+            // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
+            let botonRecoger= document.createElement("button")
+            botonRecoger.textContent="Recoger"
+            botonRecoger.onclick=function(){
+                recoger(nuevoPedido, botonRecoger) // A la función recoger le paso los parámetros del nuevoPedido para que tenga los "datos"
+            }                                      // de ese pedido, y el botonRecoger para después poder cambiarlo por el botonConfirmarRecogida
+
+
+            // Variables para añadir los nuevos pedidos a la zona de display
+            let nuevoPedido = document.createElement("li")
+            nuevoPedido.id = `pedido${contador}`
+            nuevoPedido.textContent = `pedido ${contador}. Tiempo restante: ${(tiempoPedido/1000)} segundos`
+            pedidosConfirmados.appendChild(nuevoPedido)
+
+            // let actualizarPedido= setInterval(() => {
+            //     let tiempoRestante= parseInt((tiempoPedido/1000) - 10)
+            //     nuevoPedido.textContent = Pedido ${contador}. Tiempo restante: ${(tiempoRestante)} segundos
+            //     tiempoPedido= tiempoRestante * 1000
+
+            //     if(tiempoRestante <=0){
+            //         clearInterval(actualizarPedido)
+            //     }
+            // }, 10000);
+
+            // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
+            setTimeout(() => {
+                pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
+                pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
+
+
+                // tiempoPedido= tiempoTotal
+                // clearInterval(actualizarPedido)
+
+                // actualizarPedido= setInterval(() => {
+                //     let tiempoRestante= parseInt((tiempoPedido/1000) - 10)
+                //     nuevoPedido.textContent = Pedido ${contador}. Tiempo restante: ${(tiempoRestante)} segundos
+                //     tiempoPedido= tiempoRestante * 1000
+
+                //     if(tiempoRestante <=0){
+                //         clearInterval(actualizarPedido)
+                //     }
+                // }, 10000);
+            }, tiempoTotal)
+
+            // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
+            setTimeout(() => {
+                pedidosPreparacion.removeChild(nuevoPedido)
+                pedidosListos.appendChild(nuevoPedido)
+                nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
+            }, tiempoTotal * 2)
+        }
+
+
+        // Función para confirmar la recogida de un pedido en la zona de recogida
+        function recoger(pedido, botonRecoger){
+            let zonaRecogida=document.getElementById("lista-recogida")
+
+            // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
+            botonRecoger.remove()
+            zonaRecogida.appendChild(pedido)
+
+            let botonConfirmarRecogida= document.createElement("button")
+            botonConfirmarRecogida.textContent="Confirmar Recogida"
+            botonConfirmarRecogida.onclick=function(){
+                confirmarRecogida(pedido)
+            }
+            pedido.appendChild(botonConfirmarRecogida)
+        }
+
+
+        // Función que elimina un pedido cuando confirmamos su recogida
+        function confirmarRecogida(pedido){
+            pedido.remove() // Eliminamos el pedido cuando confirmamos su recogida
+        }
+        
+        var productoSeleccionado = "";
+        var precioBase = 0;
+        //Esta Función lo que hace es recibir como parámetros los div con las imagenes
+        //cuando hay uno seleccionado no permite que se seleccione otro
+        function seleccionarProducto(nombre, precio, elemento) {
+            productoSeleccionado = nombre;
+            precioBase = precio;
+
+            let productos = document.querySelectorAll(".producto");
+            productos.forEach(p => p.classList.remove("seleccionado"));
+
+            elemento.classList.add("seleccionado");
+
+            document.getElementById("total").textContent = precioBase.toFixed(2);
+        }
+
+        function confirmarPedido() {
+            if (!productoSeleccionado) {
+                alert("Debes seleccionar un producto.");
+                return;
+            }
+
+            alert("Pedido confirmado: " + productoSeleccionado + " - " + precioBase.toFixed(2) + "€");
+        }
+    </script>
+
+</head>
+<body>
+
+    <div id="container">
+        
+        <!-- Zona de Pedido -->
+        <div id="zona-pedido" class="zona">
+            <h2>Zona de Pedido</h2>
+
+            <h3>Selecciona tu Producto:</h3>
+        <div class="productos">
+            <div class="producto" onclick="seleccionarProducto('hamburguesa', 5.00, this)">
+                <img src="imagenes/hamburguesa.png" alt="Hamburguesa">
+                <p>Hamburguesa - 5.00€</p>
+            </div>
+            <div class="producto" onclick="seleccionarProducto('perrito', 3.50, this)">
+                <img src="imagenes/perrito.png" alt="Perrito Caliente">
+                <p>Perrito Caliente - 3.50€</p>
+            </div>
+            <div class="producto" onclick="seleccionarProducto('bocadillo', 4.00, this)">
+                <img src="imagenes/bocadillo.png" alt="Bocadillo">
+                <p>Bocadillo - <br>4.00€</p>
+            </div>
+        </div>
+
+
+            <h3>Ingredientes adicionales (0.50€ c/u):</h3>
+            <ul>
+                <li><input type="checkbox" id="bacon"> <label for="bacon">Bacon</label></li>
+                <li><input type="checkbox" id="cebolla"> <label for="cebolla">Cebolla caramelizada</label></li>
+                <li><input type="checkbox" id="huevo"> <label for="huevo">Huevo frito</label></li>
+                <li><input type="checkbox" id="champinones"> <label for="champinones">Champiñones</label></li>
+                <li><input type="checkbox" id="jalapenos"> <label for="jalapenos">Jalapeños</label></li>
+                <li><input type="checkbox" id="mayonesa"> <label for="mayonesa">Mayonesa especial</label></li>
+            </ul>
+
+            <h3>Complementos:</h3>
+            <ul>
+                <li><input type="checkbox" id="patatas"> <label for="patatas">Patatas fritas - 2.00€</label></li>
+                <li><input type="checkbox" id="ensalada"> <label for="ensalada">Ensalada - 1.50€</label></li>
+                <li><input type="checkbox" id="aros"> <label for="aros">Aros de cebolla - 2.50€</label></li>
+            </ul>
+
+            <h3>Bebidas:</h3>
+            <ul>
+                <li><input type="radio" name="bebida" value="agua"> Agua - 1.00€</li>
+                <li><input type="radio" name="bebida" value="refresco"> Refresco - 1.50€</li>
+                <li><input type="radio" name="bebida" value="cerveza"> Cerveza sin alcohol - 2.00€</li>
+            </ul>
+
+            <h3>Cantidad:</h3>
+            <input type="number" id="cantidad" value="1" min="1" max="50">
+
+            <button onclick="añadirPedido()">Hacer Pedido</button>
+        </div>
+
+        <!-- Zona de Display -->
+        <div id="zona-display" class="zona">
+            <h2>Zona de Display</h2>
+                <ul id="lista-pedidos">
+                    <!-- Aquí se agregarán los pedidos en proceso -->
+                    <u><strong>CONFIRMADOS</strong></u>
+                    <ul id="pedidosConfirmados">
+                        <!-- Aquí se agregan los pedidos confirmados -->
+                    </ul>
+                    <u><strong>EN PREPARACIÓN</strong></u>
+                    <ul id="pedidosPreparacion">
+                        <!-- Aquí se agregan los pedidos en preparación -->
+                    </ul>
+                    <u><strong>LISTO PARA RECOGER</strong></u>
+                    <ul id="pedidosListos">
+                        <!-- Aquí se agregan los pedidos listos para recoger -->
+                    </ul>
+                </ul>
+        </div>
+
+        <!-- Zona de Recogida -->
+        <div id="zona-recogida" class="zona">
+            <h2>Zona de Recogida</h2>
+            <ul id="lista-recogida">
+                <!-- Aquí se agregarán los pedidos listos para recoger -->
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>
