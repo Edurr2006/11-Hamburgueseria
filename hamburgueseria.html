@@ -186,11 +186,12 @@ summary {
             let cantidadHamburguesas= productos["Hamburguesa"] ? productos["Hamburguesa"].cantidad: 0
             let cantidadPerritos= productos["Perrito Caliente"] ? productos["Perrito Caliente"].cantidad: 0
             let cantidadBocadillos= productos["Bocadillo"] ? productos["Bocadillo"].cantidad: 0
+            let cantidadProductosPrincipales= cantidadHamburguesas + cantidadPerritos + cantidadBocadillos
 
                 // Aquí hago la SUMA TOTAL de productos principales que tengo y lo multiplico por 30 para calcular el tiempo
                 // que va a ver el usuario
-            let tiempoExtra= (cantidadHamburguesas + cantidadPerritos + cantidadBocadillos) * 30
-        console.log("tiempo extra" + tiempoExtra)
+            let tiempoVeUsuario= cantidadProductosPrincipales * 30
+        console.log("tiempo extra" + tiempoVeUsuario)
 
                 // Edu: Para Vaciar la cesta y el total a pagar una vez presionado el boton de añadir pedido
             total= 0
@@ -218,10 +219,10 @@ summary {
                 // Variables para añadir los nuevos pedidos a la zona de display
             let nuevoPedido = document.createElement("li")
             nuevoPedido.id = `pedido${contador}`
-            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoExtra} segundos`
+            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoVeUsuario} segundos`
             pedidosConfirmados.appendChild(nuevoPedido)
 
-            let tiempoRestante= tiempoExtra
+            let tiempoRestante= tiempoVeUsuario
             let actualizarPedido= setInterval(() => {
                 tiempoRestante -=10
                 nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
