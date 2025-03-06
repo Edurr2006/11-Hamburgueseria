@@ -221,7 +221,7 @@ summary {
             nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoExtra} segundos`
             pedidosConfirmados.appendChild(nuevoPedido)
 
-            let tiempoRestante= 30
+            let tiempoRestante= tiempoExtra
             let actualizarPedido= setInterval(() => {
                 tiempoRestante -=10
                 nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
@@ -295,7 +295,6 @@ summary {
             alert("Pedido confirmado: " + productoSeleccionado + " - " + precioBase.toFixed(2) + "€");
         }
 
-       
 
         let productos = {}; // Objeto para almacenar los productos agregados
         var total = 0; // Variable para el total de la compra
