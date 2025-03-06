@@ -182,6 +182,16 @@ summary {
             contador +=1
             let numeroPedido= contador
 
+                // Calcula la cantidad de PRODUCTOS PRINCIPALES que hay de cada uno
+            let cantidadHamburguesas= productos["Hamburguesa"] ? productos["Hamburguesa"].cantidad: 0
+            let cantidadPerritos= productos["Perrito Caliente"] ? productos["Perrito Caliente"].cantidad: 0
+            let cantidadBocadillos= productos["Bocadillo"] ? productos["Bocadillo"].cantidad: 0
+
+                // Aquí hago la SUMA TOTAL de productos principales que tengo y lo multiplico por 30 para calcular el tiempo
+                // que va a ver el usuario
+            let tiempoExtra= (cantidadHamburguesas + cantidadPerritos + cantidadBocadillos) * 30
+        console.log("tiempo extra" + tiempoExtra)
+
                 // Edu: Para Vaciar la cesta y el total a pagar una vez presionado el boton de añadir pedido
             total= 0
             document.getElementById("total").innerHTML = '0,00 €'
@@ -205,11 +215,10 @@ summary {
                 recoger(nuevoPedido, botonRecoger) // A la función recoger le paso los parámetros del nuevoPedido para que tenga los "datos"
             }                                      // de ese pedido, y el botonRecoger para después poder cambiarlo por el botonConfirmarRecogida
 
-
                 // Variables para añadir los nuevos pedidos a la zona de display
             let nuevoPedido = document.createElement("li")
             nuevoPedido.id = `pedido${contador}`
-            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: 30 segundos`
+            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoExtra} segundos`
             pedidosConfirmados.appendChild(nuevoPedido)
 
             let tiempoRestante= 30
@@ -274,8 +283,6 @@ summary {
         var total = precioBase + precioBebida + precioComplemento;
         document.getElementById("total").textContent = total.toFixed(2) + "€";
 }
-
-
 
 
 
