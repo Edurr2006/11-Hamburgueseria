@@ -184,17 +184,17 @@ summary {
             document.getElementById("total").innerHTML = '0,00 €'
             productos = {};
             actualizarCarrito();
-            // Variables con las distintas zonas dentro de la zona de display
+                // Variables con las distintas zonas dentro de la zona de display
             let pedidosConfirmados=document.getElementById("pedidosConfirmados")
             let pedidosPreparacion=document.getElementById("pedidosPreparacion")
             let pedidosListos=document.getElementById("pedidosListos")
 
-            // Variables para obtener el tiempo de preparación de cada pedido
+                // Variables para obtener el tiempo de preparación de cada pedido
             let numeroAleatorio=parseInt(Math.random() * 20 + 1)
             let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
             let tiempoPedido= tiempoTotal // Variable que estoy utilizando para actualizar el tiempo en el setInterval (estoy probando xddd)
         
-            // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
+                // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
             let botonRecoger= document.createElement("button")
             botonRecoger.textContent="Recoger"
             botonRecoger.onclick=function(){
@@ -202,7 +202,7 @@ summary {
             }                                      // de ese pedido, y el botonRecoger para después poder cambiarlo por el botonConfirmarRecogida
 
 
-            // Variables para añadir los nuevos pedidos a la zona de display
+                // Variables para añadir los nuevos pedidos a la zona de display
             let nuevoPedido = document.createElement("li")
             nuevoPedido.id = `pedido${contador}`
             nuevoPedido.textContent = `pedido ${contador}. Tiempo restante: ${(tiempoPedido/1000)} segundos`
@@ -238,7 +238,7 @@ summary {
                 // }, 10000);
             }, tiempoTotal)
 
-            // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
+                // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
             setTimeout(() => {
                 pedidosPreparacion.removeChild(nuevoPedido)
                 pedidosListos.appendChild(nuevoPedido)
@@ -247,7 +247,7 @@ summary {
         }
 
 
-        // Función para confirmar la recogida de un pedido en la zona de recogida
+            // Función para confirmar la recogida de un pedido en la zona de recogida
         function recoger(pedido, botonRecoger){
             let zonaRecogida=document.getElementById("lista-recogida")
 
@@ -264,7 +264,7 @@ summary {
         }
 
 
-        // Función que elimina un pedido cuando confirmamos su recogida
+            // Función que elimina un pedido cuando confirmamos su recogida
         function confirmarRecogida(pedido){
             pedido.remove() // Eliminamos el pedido cuando confirmamos su recogida
         }
