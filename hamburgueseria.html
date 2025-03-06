@@ -205,9 +205,16 @@ summary {
             let pedidosListos=document.getElementById("pedidosListos")
 
                 // Variables para obtener el tiempo de preparación de cada pedido
-            let numeroAleatorio=parseInt(Math.random() * 20 + 1)
-            let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
-        console.log("pedido" + numeroPedido + "tiempo" + tiempoTotal)
+        //     let numeroAleatorio=parseInt(Math.random() * 20 + 1)
+        //     let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
+        // console.log("pedido" + numeroPedido + "tiempo" + tiempoTotal)
+
+            let tiempoTotal=0
+            for (let i=0; i<cantidadProductosPrincipales; i++){
+                let numeroAleatorio=parseInt(Math.random() * 20 + 1)
+                tiempoTotal += (19 + numeroAleatorio)
+            }
+        console.log("Tiempo total : " + tiempoTotal);
         
                 // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
             let botonRecoger= document.createElement("button")
@@ -224,36 +231,36 @@ summary {
 
             let tiempoRestante= tiempoVeUsuario
             let actualizarPedido= setInterval(() => {
-                tiempoRestante -=10
+                tiempoRestante -=1
                 nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
 
                 if(tiempoRestante <=0){
                     clearInterval(actualizarPedido)
                 }
-            }, 10000);
+            }, 1000);
 
                 // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
             setTimeout(() => {
                 pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
                 pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
 
-                tiempoRestante= 30
+                tiempoRestante= tiempoVeUsuario
                 actualizarPedido= setInterval(() => {
-                    tiempoRestante -=10
+                    tiempoRestante -=1
                     nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
 
                     if(tiempoRestante <=0){
                         clearInterval(actualizarPedido)
                         }
-                    }, 10000);
-            }, tiempoTotal)
+                    }, 1000);
+            }, tiempoTotal * 500)
 
                 // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
             setTimeout(() => {
                 pedidosPreparacion.removeChild(nuevoPedido)
                 pedidosListos.appendChild(nuevoPedido)
                 nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
-            }, tiempoTotal * 2)
+            }, tiempoTotal * 1000)
         }
 
 
