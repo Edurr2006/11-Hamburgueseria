@@ -191,7 +191,6 @@ summary {
                 // Aquí hago la SUMA TOTAL de productos principales que tengo y lo multiplico por 30 para calcular el tiempo
                 // que va a ver el usuario
             let tiempoVeUsuario= cantidadProductosPrincipales * 30
-        console.log("tiempo extra" + tiempoVeUsuario)
 
                 // Edu: Para Vaciar la cesta y el total a pagar una vez presionado el boton de añadir pedido
             total= 0
@@ -209,7 +208,9 @@ summary {
                 let numeroAleatorio=parseInt(Math.random() * 20 + 1)
                 tiempoTotal += (19 + numeroAleatorio)
             }
+        console.log("Pedido" + numeroPedido)
         console.log("Tiempo total : " + tiempoTotal);
+
         
                 // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
             let botonRecoger= document.createElement("button")
@@ -246,6 +247,7 @@ summary {
                 pedidosPreparacion.removeChild(nuevoPedido)
                 pedidosListos.appendChild(nuevoPedido)
                 nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
+                    clearInterval(actualizarPedido)
             }, tiempoTotal * 1000)
         }
 
