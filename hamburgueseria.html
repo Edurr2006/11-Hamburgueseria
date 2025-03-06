@@ -204,11 +204,6 @@ summary {
             let pedidosPreparacion=document.getElementById("pedidosPreparacion")
             let pedidosListos=document.getElementById("pedidosListos")
 
-                // Variables para obtener el tiempo de preparación de cada pedido
-        //     let numeroAleatorio=parseInt(Math.random() * 20 + 1)
-        //     let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
-        // console.log("pedido" + numeroPedido + "tiempo" + tiempoTotal)
-
             let tiempoTotal=0
             for (let i=0; i<cantidadProductosPrincipales; i++){
                 let numeroAleatorio=parseInt(Math.random() * 20 + 1)
@@ -244,15 +239,6 @@ summary {
                 pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
                 pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
 
-                tiempoRestante= tiempoVeUsuario
-                actualizarPedido= setInterval(() => {
-                    tiempoRestante -=1
-                    nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
-
-                    if(tiempoRestante <=0){
-                        clearInterval(actualizarPedido)
-                        }
-                    }, 1000);
             }, tiempoTotal * 500)
 
                 // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
