@@ -23,7 +23,7 @@
 
         /* Estilos generales de cada zona */
         .zona {
-            background: #FFF44F;
+            background: #fff34fac;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
@@ -35,12 +35,14 @@
         h2 {
             text-align: center;
             margin-bottom: 15px;
+            background-color: #f4f4f4;
         }
 
         /* 5️ Listas de selección */
         ul {
             list-style: none;
             padding: 0;
+
         }
 
         li {
@@ -102,11 +104,56 @@
             transform: scale(1.05);
         }
 
-        .seleccionado {
-            border: 3px solid #27aea5;
-            background-color: rgba(39, 174, 96, 0.2);
-        }
 
+        /* Estilos para el contenedor desplegable */
+.desplegable {
+    background: #21918a6a;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+/* Estilo del botón de despliegue */
+summary {
+    font-weight: bold;
+    font-size: 16px;
+    padding: 5px;
+    list-style: none; /* Oculta la flecha predeterminada */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Cambia el cursor al pasar sobre el botón de despliegue */
+
+
+/* Estilos para la lista cuando se despliega */
+.desplegable[open] {
+    background: #fff34fac;
+}
+
+.cesta {
+        width: fit-content;
+        margin: 10px auto;
+        cursor: pointer;
+        background-color: white;
+        border-radius: 5px;
+    }
+
+    .cesta summary {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .cesta img {
+        width: 50px; /* Ajusta el tamaño de la imagen de la cesta */
+        height: auto;
+    }
+
+   
     </style>
 
     <script type="text/javascript">
@@ -200,22 +247,16 @@
         function confirmarRecogida(pedido){
             pedido.remove() // Eliminamos el pedido cuando confirmamos su recogida
         }
-        
-        var productoSeleccionado = "";
-        var precioBase = 0;
-        //Esta Función lo que hace es recibir como parámetros los div con las imagenes
-        //cuando hay uno seleccionado no permite que se seleccione otro
-        function seleccionarProducto(nombre, precio, elemento) {
-            productoSeleccionado = nombre;
-            precioBase = precio;
 
-            let productos = document.querySelectorAll(".producto");
-            productos.forEach(p => p.classList.remove("seleccionado"));
+// Función para actualizar el total
+        function actualizarTotal() {
+        var total = precioBase + precioBebida + precioComplemento;
+        document.getElementById("total").textContent = total.toFixed(2) + "€";
+}
 
-            elemento.classList.add("seleccionado");
 
-            document.getElementById("total").textContent = precioBase.toFixed(2);
-        }
+
+
 
         function confirmarPedido() {
             if (!productoSeleccionado) {
@@ -225,8 +266,28 @@
 
             alert("Pedido confirmado: " + productoSeleccionado + " - " + precioBase.toFixed(2) + "€");
         }
-    </script>
 
+        var productos = {}; // Guardará los productos añadidos
+
+        function agregarcesta(nombre, precio) {
+    if (!productos[nombre]) {
+        productos[nombre] = { cantidad: 0, precioTotal: 0 }; // Inicializar el producto si no existe
+    }
+
+    productos[nombre].cantidad += 1; // Incrementar la cantidad
+    productos[nombre].precioTotal += precio; // Incrementar el precio total
+
+    // Actualizar el contenido del carrito, pero agregando los nuevos productos sin borrar lo anterior
+    let contenidoCarrito = "";
+    for (let producto in productos) {
+        contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal}€<br>`;
+    }
+
+    document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
+}
+
+
+ </script>
 </head>
 <body>
 
@@ -238,51 +299,72 @@
 
             <h3>Selecciona tu Producto:</h3>
         <div class="productos">
-            <div class="producto" onclick="seleccionarProducto('hamburguesa', 5.00, this)">
-                <img src="imagenes/hamburguesa.png" alt="Hamburguesa">
+            <div class="producto">
+                <img src="imagenes/hamburguesa.png" alt="Hamburguesa" onclick="agregarcesta('Hamburguesa',5.00)">
                 <p>Hamburguesa - 5.00€</p>
             </div>
-            <div class="producto" onclick="seleccionarProducto('perrito', 3.50, this)">
+            <div class="producto">
                 <img src="imagenes/perrito.png" alt="Perrito Caliente">
                 <p>Perrito Caliente - 3.50€</p>
             </div>
-            <div class="producto" onclick="seleccionarProducto('bocadillo', 4.00, this)">
+            <div class="producto">
                 <img src="imagenes/bocadillo.png" alt="Bocadillo">
                 <p>Bocadillo - <br>4.00€</p>
             </div>
         </div>
 
 
-            <h3>Ingredientes adicionales (0.50€ c/u):</h3>
-            <ul>
-                <li><input type="checkbox" id="bacon"> <label for="bacon">Bacon</label></li>
-                <li><input type="checkbox" id="cebolla"> <label for="cebolla">Cebolla caramelizada</label></li>
-                <li><input type="checkbox" id="huevo"> <label for="huevo">Huevo frito</label></li>
-                <li><input type="checkbox" id="champinones"> <label for="champinones">Champiñones</label></li>
-                <li><input type="checkbox" id="jalapenos"> <label for="jalapenos">Jalapeños</label></li>
-                <li><input type="checkbox" id="mayonesa"> <label for="mayonesa">Mayonesa especial</label></li>
-            </ul>
+        
+        
 
             <h3>Complementos:</h3>
-            <ul>
-                <li><input type="checkbox" id="patatas"> <label for="patatas">Patatas fritas - 2.00€</label></li>
-                <li><input type="checkbox" id="ensalada"> <label for="ensalada">Ensalada - 1.50€</label></li>
-                <li><input type="checkbox" id="aros"> <label for="aros">Aros de cebolla - 2.50€</label></li>
-            </ul>
+        <div class="productos">
+            <div class="producto">
+                <img src="imagenes/patatas.png" alt="Patatas Fritas" onclick="agregarcesta('Patatas',2.00)">
+                <p>Patatas Fritas - 2.00€</p>
+            </div>
+            <div class="producto">
+                <img src="imagenes/ensalada.png" alt="Ensalada">
+                <p>Ensalada - 1.50€</p>
+            </div>
+            <div class="producto">
+                <img src="imagenes/aros.png" alt="Aros de Cebolla">
+                <p>Aros de Cebolla - 2.50€</p>
+            </div>
+        </div>
 
-            <h3>Bebidas:</h3>
-            <ul>
-                <li><input type="radio" name="bebida" value="agua"> Agua - 1.00€</li>
-                <li><input type="radio" name="bebida" value="refresco"> Refresco - 1.50€</li>
-                <li><input type="radio" name="bebida" value="cerveza"> Cerveza sin alcohol - 2.00€</li>
-            </ul>
+
+                <h3>Bebidas:</h3>
+        <div class="productos">
+            <div class="producto">
+                <img src="imagenes/agua.png" alt="Agua">
+                <p>Agua - 1.00€</p>
+            </div>
+            <div class="producto">
+                <img src="imagenes/refresco.png" alt="Refresco">
+                <p>Refresco - 1.50€</p>
+            </div>
+            <div class="producto">
+                <img src="imagenes/cerveza.png" alt="Cerveza sin alcohol">
+                <p>Cerveza sin alcohol - 2.00€</p>
+    </div>
+</div>
+        
+    <details class="cesta">
+                    <summary><img src="imagenes/cesta.png" alt="cesta"></summary>
+                    <div id="cestacontenido"></div>
+    </details>
+
 
             <h3>Cantidad:</h3>
             <input type="number" id="cantidad" value="1" min="1" max="50">
 
             <button onclick="añadirPedido()">Hacer Pedido</button>
+            <h3>Total a pagar:</h3>
+            <p><strong id="total">0.00</strong> €</p>
         </div>
 
+            
         <!-- Zona de Display -->
         <div id="zona-display" class="zona">
             <h2>Zona de Display</h2>
@@ -315,3 +397,13 @@
 
 </body>
 </html>
+<!-- <summary>Adicionales +(0.50€ c/u)</summary>
+                <ul>
+                    <li><input type="checkbox" id="bacon"> <label for="bacon">Bacon</label></li>
+                    <li><input type="checkbox" id="cebolla"> <label for="cebolla">Cebolla caramelizada</label></li>
+                    <li><input type="checkbox" id="huevo"> <label for="huevo">Huevo frito</label></li>
+                    <li><input type="checkbox" id="champinones"> <label for="champinones">Champiñones</label></li>
+                    <li><input type="checkbox" id="jalapenos"> <label for="jalapenos">Jalapeños</label></li>
+                    <li><input type="checkbox" id="mayonesa"> <label for="mayonesa">Mayonesa especial</label></li>
+                    </ul>
+        </details> -->

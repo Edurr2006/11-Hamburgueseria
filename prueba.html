@@ -70,8 +70,67 @@
             border-radius: 5px;
             background: #eee;
         }
+        /* Estilo para el contenedor de productos */
+.productos {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.producto {
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Ocultamos los checkboxes */
+.producto-checkbox {
+    display: none;
+}
+
+/* Estilo para la imagen cuando el checkbox está marcado */
+.producto-checkbox:checked + label img {
+    border: 3px solid green; /* Borde verde para indicar que está seleccionado */
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Estilo para la imagen cuando no está seleccionada */
+.producto-checkbox:not(:checked) + label img {
+    border: 3px solid transparent;
+    box-shadow: none;
+}
+
+/* Aseguramos que las imágenes tengan un tamaño adecuado */
+.producto img {
+    width: 100px;
+    height: 100px;
+}
+
+/* Opcional: hacer que el texto esté justo debajo de la imagen */
+.producto p {
+    margin-top: 10px;
+}
 
     </style>
+    <script>
+        let total = 0; // Total inicial
+
+function actualizarTotal() {
+    // Inicializamos el total en 0
+    total = 0;
+
+    // Seleccionamos todos los checkboxes de productos
+    const checkboxes = document.querySelectorAll('.producto-checkbox:checked');
+
+    // Sumamos el precio de cada producto seleccionado
+    checkboxes.forEach(checkbox => {
+        total += parseFloat(checkbox.getAttribute('data-precio'));
+    });
+
+    // Mostramos el total actualizado
+    document.getElementById('total').textContent = 'Total: €' + total.toFixed(2);
+}
+
+    </script>
 </head>
 <body>
 
@@ -83,36 +142,32 @@
         <div id="zona-pedido" class="zona">
             <h2>Zona de Pedido</h2>
 
-            <h3>Producto Principal:</h3>
-            <select id="producto">
-                <option value="hamburguesa" data-precio="5.00">Hamburguesa - 5.00€</option>
-                <option value="perrito" data-precio="3.50">Perrito Caliente - 3.50€</option>
-                <option value="bocadillo" data-precio="4.00">Bocadillo - 4.00€</option>
-            </select>
-
-            <h3>Ingredientes adicionales (0.50€ c/u):</h3>
-            <ul>
-                <li><input type="checkbox" value="Bacon"> Bacon</li>
-                <li><input type="checkbox" value="Cebolla caramelizada"> Cebolla caramelizada</li>
-                <li><input type="checkbox" value="Huevo frito"> Huevo frito</li>
-                <li><input type="checkbox" value="Champiñones"> Champiñones</li>
-                <li><input type="checkbox" value="Jalapeños"> Jalapeños</li>
-                <li><input type="checkbox" value="Mayonesa especial"> Mayonesa especial</li>
-            </ul>
-
-            <h3>Complementos:</h3>
-            <ul>
-                <li><input type="checkbox" value="Patatas fritas" data-precio="2.00"> Patatas fritas - 2.00€</li>
-                <li><input type="checkbox" value="Ensalada" data-precio="1.50"> Ensalada - 1.50€</li>
-                <li><input type="checkbox" value="Aros de cebolla" data-precio="2.50"> Aros de cebolla - 2.50€</li>
-            </ul>
-
-            <h3>Bebida:</h3>
-            <select id="bebida">
-                <option value="Agua" data-precio="1.00">Agua - 1.00€</option>
-                <option value="Refresco" data-precio="1.50">Refresco - 1.50€</option>
-                <option value="Cerveza" data-precio="2.00">Cerveza sin alcohol - 2.00€</option>
-            </select>
+            <div class="productos">
+                <div class="producto">
+                    <input type="checkbox" id="hamburguesa" class="producto-checkbox" data-precio="5.00" onchange="actualizarTotal()">
+                    <label for="hamburguesa">
+                        <img src="imagenes/hamburguesa.png" alt="Hamburguesa">
+                        <p>Hamburguesa - 5.00€</p>
+                    </label>
+                </div>
+                <div class="producto">
+                    <input type="checkbox" id="perrito" class="producto-checkbox" data-precio="3.50" onchange="actualizarTotal()">
+                    <label for="perrito">
+                        <img src="imagenes/perrito.png" alt="Perrito Caliente">
+                        <p>Perrito Caliente - 3.50€</p>
+                    </label>
+                </div>
+                <div class="producto">
+                    <input type="checkbox" id="bocadillo" class="producto-checkbox" data-precio="4.00" onchange="actualizarTotal()">
+                    <label for="bocadillo">
+                        <img src="imagenes/bocadillo.png" alt="Bocadillo">
+                        <p>Bocadillo - 4.00€</p>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Repetir lo mismo para Bebidas y Complementos -->
+            
 
             <h3>Cantidad:</h3>
             <input type="number" id="cantidad" value="1" min="1" max="50">
