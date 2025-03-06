@@ -103,7 +103,25 @@
         .producto:hover {
             transform: scale(1.05);
         }
-
+.cesta {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .producto-cesta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .producto-cesta:last-child {
+            border-bottom: none;
+        }
 
         /* Estilos para el contenedor desplegable */
 .desplegable {
@@ -162,7 +180,10 @@ summary {
         // Función para añadir un pedido a la zona de display
         function añadirPedido(){
             contador +=1
-
+        // Edu: Para Vaciar la cesta y el total a pagar una vez presionado el boton de añadir pedido
+            document.getElementById("total").innerHTML = '0,00 €'
+            productos = {};
+            actualizarCarrito();
             // Variables con las distintas zonas dentro de la zona de display
             let pedidosConfirmados=document.getElementById("pedidosConfirmados")
             let pedidosPreparacion=document.getElementById("pedidosPreparacion")
@@ -267,134 +288,130 @@ summary {
             alert("Pedido confirmado: " + productoSeleccionado + " - " + precioBase.toFixed(2) + "€");
         }
 
-        var productos = {}; // Guardará los productos añadidos
+       
+
+        let productos = {}; // Objeto para almacenar los productos agregados
+        var total = 0; // Variable para el total de la compra
 
         function agregarcesta(nombre, precio) {
-    if (!productos[nombre]) {
-        productos[nombre] = { cantidad: 0, precioTotal: 0 }; // Inicializar el producto si no existe
-    }
+            if (!productos[nombre]) {
+            productos[nombre] = { cantidad: 0, precioTotal: 0 }; // Inicializar si no existe
+        }
 
-    productos[nombre].cantidad += 1; // Incrementar la cantidad
-    productos[nombre].precioTotal += precio; // Incrementar el precio total
+        productos[nombre].cantidad += 1; // Incrementar la cantidad
+        productos[nombre].precioTotal += precio; // Incrementar el precio total
 
-    // Actualizar el contenido del carrito, pero agregando los nuevos productos sin borrar lo anterior
+        // Actualizar el total sumando el nuevo precio
+        total += precio;
+
+    // Actualizar la vista del carrito
+    actualizarCarrito();
+}
+
+// Función para actualizar el contenido del carrito
+function actualizarCarrito() {
     let contenidoCarrito = "";
+    
     for (let producto in productos) {
-        contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal}€<br>`;
+        contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal.toFixed(2)}€<br>`;
     }
 
     document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
+    
+    // Mostrar el total en el HTML
+    document.getElementById("total").textContent = total.toFixed(2);
 }
 
 
  </script>
 </head>
 <body>
-
     <div id="container">
-        
         <!-- Zona de Pedido -->
         <div id="zona-pedido" class="zona">
             <h2>Zona de Pedido</h2>
-
+    
             <h3>Selecciona tu Producto:</h3>
-        <div class="productos">
-            <div class="producto">
-                <img src="imagenes/hamburguesa.png" alt="Hamburguesa" onclick="agregarcesta('Hamburguesa',5.00)">
-                <p>Hamburguesa - 5.00€</p>
+            <div class="productos">
+                <div class="producto">
+                    <img src="imagenes/hamburguesa.png" alt="Hamburguesa" onclick="agregarcesta('Hamburguesa',5.00)">
+                    <p>Hamburguesa - 5.00€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/perrito.png" alt="Perrito Caliente" onclick="agregarcesta('Perrito Caliente',3.50)">
+                    <p>Perrito Caliente - 3.50€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/bocadillo.png" alt="Bocadillo" onclick="agregarcesta('Bocadillo',4.00)">
+                    <p>Bocadillo - <br>4.00€</p>
+                </div>
             </div>
-            <div class="producto">
-                <img src="imagenes/perrito.png" alt="Perrito Caliente" onclick="agregarcesta('Perrito Caliente',3.50)">
-                <p>Perrito Caliente - 3.50€</p>
-            </div>
-            <div class="producto">
-                <img src="imagenes/bocadillo.png" alt="Bocadillo" onclick="agregarcesta('Bocadillo',4.00)">
-                <p>Bocadillo - <br>4.00€</p>
-            </div>
-        </div>
-
-
-        
-        
-
+    
             <h3>Complementos:</h3>
-        <div class="productos">
-            <div class="producto">
-                <img src="imagenes/patatas.png" alt="Patatas Fritas" onclick="agregarcesta('Patatas',2.00)">
-                <p>Patatas Fritas - 2.00€</p>
+            <div class="productos">
+                <div class="producto">
+                    <img src="imagenes/patatas.png" alt="Patatas Fritas" onclick="agregarcesta('Patatas',2.00)">
+                    <p>Patatas Fritas - 2.00€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/ensalada.png" alt="Ensalada" onclick="agregarcesta('Ensalada',1.50)">
+                    <p>Ensalada - 1.50€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/aros.png" alt="Aros de Cebolla" onclick="agregarcesta('Aros',2.50)">
+                    <p>Aros de Cebolla - 2.50€</p>
+                </div>
             </div>
-            <div class="producto">
-                <img src="imagenes/ensalada.png" alt="Ensalada" onclick="agregarcesta('Ensalada',1.50)">
-                <p>Ensalada - 1.50€</p>
+    
+            <h3>Bebidas:</h3>
+            <div class="productos">
+                <div class="producto">
+                    <img src="imagenes/agua.png" alt="Agua" onclick="agregarcesta('Agua', 1.00)">
+                    <p>Agua - 1.00€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/refresco.png" alt="Refresco" onclick="agregarcesta('Refresco', 1.50)">
+                    <p>Refresco - 1.50€</p>
+                </div>
+                <div class="producto">
+                    <img src="imagenes/cerveza.png" alt="Cerveza sin alcohol" onclick="agregarcesta('Cerveza 0%', 2.00)">
+                    <p>Cerveza sin alcohol - 2.00€</p>
+                </div>
             </div>
-            <div class="producto">
-                <img src="imagenes/aros.png" alt="Aros de Cebolla" onclick="agregarcesta('Aros',2.50)">
-                <p>Aros de Cebolla - 2.50€</p>
-            </div>
-        </div>
-
-
-                <h3>Bebidas:</h3>
-        <div class="productos">
-            <div class="producto">
-                <img src="imagenes/agua.png" alt="Agua" onclick="agregarcesta('Agua', 1.00)">
-                <p>Agua - 1.00€</p>
-            </div>
-            <div class="producto">
-                <img src="imagenes/refresco.png" alt="Refresco" onclick="agregarcesta('Refresco', 1.50)">
-                <p>Refresco - 1.50€</p>
-            </div>
-            <div class="producto">
-                <img src="imagenes/cerveza.png" alt="Cerveza sin alcohol" onclick="agregarcesta('Cerveza 0%', 2.00)">
-                <p>Cerveza sin alcohol - 2.00€</p>
-    </div>
-</div>
-        
-    <details class="cesta">
-                    <summary><img src="imagenes/cesta.png" alt="cesta"></summary>
-                    <div id="cestacontenido"></div>
-    </details>
-
-
-            <h3>Cantidad:</h3>
-            <input type="number" id="cantidad" value="1" min="1" max="50">
-
-            <button onclick="añadirPedido()">Hacer Pedido</button>
+    
+            <details class="cesta">
+                <summary><img src="imagenes/cesta.png" alt="cesta"> Cesta</summary>
+                <div id="cestacontenido" class="cesta-contenido"></div>
+            </details>
+    
+            <button onclick="añadirPedido()" class="btn">Hacer Pedido</button>
+    
             <h3>Total a pagar:</h3>
             <p><strong id="total">0.00</strong> €</p>
         </div>
-
-            
+    
         <!-- Zona de Display -->
         <div id="zona-display" class="zona">
             <h2>Zona de Display</h2>
-                <ul id="lista-pedidos">
-                    <!-- Aquí se agregarán los pedidos en proceso -->
-                    <u><strong>CONFIRMADOS</strong></u>
-                    <ul id="pedidosConfirmados">
-                        <!-- Aquí se agregan los pedidos confirmados -->
-                    </ul>
-                    <u><strong>EN PREPARACIÓN</strong></u>
-                    <ul id="pedidosPreparacion">
-                        <!-- Aquí se agregan los pedidos en preparación -->
-                    </ul>
-                    <u><strong>LISTO PARA RECOGER</strong></u>
-                    <ul id="pedidosListos">
-                        <!-- Aquí se agregan los pedidos listos para recoger -->
-                    </ul>
-                </ul>
+            <ul id="lista-pedidos">
+                <u><strong>CONFIRMADOS</strong></u>
+                <ul id="pedidosConfirmados"></ul>
+    
+                <u><strong>EN PREPARACIÓN</strong></u>
+                <ul id="pedidosPreparacion"></ul>
+    
+                <u><strong>LISTO PARA RECOGER</strong></u>
+                <ul id="pedidosListos"></ul>
+            </ul>
         </div>
-
+    
         <!-- Zona de Recogida -->
         <div id="zona-recogida" class="zona">
             <h2>Zona de Recogida</h2>
-            <ul id="lista-recogida">
-                <!-- Aquí se agregarán los pedidos listos para recoger -->
-            </ul>
+            <ul id="lista-recogida"></ul>
         </div>
-
     </div>
-
+    
 </body>
 </html>
 <!-- <summary>Adicionales +(0.50€ c/u)</summary>
