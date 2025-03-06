@@ -203,6 +203,9 @@ summary {
             let pedidosPreparacion=document.getElementById("pedidosPreparacion")
             let pedidosListos=document.getElementById("pedidosListos")
 
+                // Hago un bucle para que por cada producto principal me saque un tiempo aleatorio de preparación de ese producto
+                // que va desde 1 hasta 20, le sumo 19 porque el rango de tiempo de preparación de cada pedido va desde 20 hasta 
+                // 40 segundos, y cada número lo voy sumando a la variable tiempoTotal para tener el tiempo de preparación de pedido
             let tiempoTotal=0
             for (let i=0; i<cantidadProductosPrincipales; i++){
                 let numeroAleatorio=parseInt(Math.random() * 20 + 1)
@@ -240,14 +243,14 @@ summary {
                 pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
                 pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
 
-            }, tiempoTotal * 500)
+            }, tiempoTotal * 500) // Multiplico por 500 para que cuando quede la mitad del TIEMPO INTERNO pase de confirmados a en preparación
 
                 // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
             setTimeout(() => {
                 pedidosPreparacion.removeChild(nuevoPedido)
                 pedidosListos.appendChild(nuevoPedido)
                 nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
-                    clearInterval(actualizarPedido)
+                    clearInterval(actualizarPedido) // Si este setTimeout llega a cero limpia el setInterval 
             }, tiempoTotal * 1000)
         }
 
