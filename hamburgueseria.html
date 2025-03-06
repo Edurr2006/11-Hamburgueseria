@@ -180,10 +180,13 @@ summary {
             // Función para añadir un pedido a la zona de display
         function añadirPedido(){
             contador +=1
+            let numeroPedido= contador
+
                 // Edu: Para Vaciar la cesta y el total a pagar una vez presionado el boton de añadir pedido
             document.getElementById("total").innerHTML = '0,00 €'
             productos = {};
             actualizarCarrito();
+
                 // Variables con las distintas zonas dentro de la zona de display
             let pedidosConfirmados=document.getElementById("pedidosConfirmados")
             let pedidosPreparacion=document.getElementById("pedidosPreparacion")
@@ -192,7 +195,7 @@ summary {
                 // Variables para obtener el tiempo de preparación de cada pedido
             let numeroAleatorio=parseInt(Math.random() * 20 + 1)
             let tiempoTotal=parseInt((19 + numeroAleatorio) * 1000) // Lo multiplico por 1000 para pasar de milisegundos a segundos
-            let tiempoPedido= tiempoTotal // Variable que estoy utilizando para actualizar el tiempo en el setInterval (estoy probando xddd)
+        console.log("pedido" + numeroPedido + "tiempo" + tiempoTotal)
         
                 // Variables para el botón de recoger dentro de la zona de display en la zona de listo para recoger
             let botonRecoger= document.createElement("button")
@@ -205,37 +208,33 @@ summary {
                 // Variables para añadir los nuevos pedidos a la zona de display
             let nuevoPedido = document.createElement("li")
             nuevoPedido.id = `pedido${contador}`
-            nuevoPedido.textContent = `pedido ${contador}. Tiempo restante: ${(tiempoPedido/1000)} segundos`
+            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: 30 segundos`
             pedidosConfirmados.appendChild(nuevoPedido)
 
-            // let actualizarPedido= setInterval(() => {
-            //     let tiempoRestante= parseInt((tiempoPedido/1000) - 10)
-            //     nuevoPedido.textContent = Pedido ${contador}. Tiempo restante: ${(tiempoRestante)} segundos
-            //     tiempoPedido= tiempoRestante * 1000
+            let tiempoRestante= 30
+            let actualizarPedido= setInterval(() => {
+                tiempoRestante -=10
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
 
-            //     if(tiempoRestante <=0){
-            //         clearInterval(actualizarPedido)
-            //     }
-            // }, 10000);
+                if(tiempoRestante <=0){
+                    clearInterval(actualizarPedido)
+                }
+            }, 10000);
 
-            // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
+                // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
             setTimeout(() => {
                 pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
                 pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
 
+                tiempoRestante= 30
+                actualizarPedido= setInterval(() => {
+                    tiempoRestante -=10
+                    nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
 
-                // tiempoPedido= tiempoTotal
-                // clearInterval(actualizarPedido)
-
-                // actualizarPedido= setInterval(() => {
-                //     let tiempoRestante= parseInt((tiempoPedido/1000) - 10)
-                //     nuevoPedido.textContent = Pedido ${contador}. Tiempo restante: ${(tiempoRestante)} segundos
-                //     tiempoPedido= tiempoRestante * 1000
-
-                //     if(tiempoRestante <=0){
-                //         clearInterval(actualizarPedido)
-                //     }
-                // }, 10000);
+                    if(tiempoRestante <=0){
+                        clearInterval(actualizarPedido)
+                        }
+                    }, 10000);
             }, tiempoTotal)
 
                 // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
@@ -251,7 +250,7 @@ summary {
         function recoger(pedido, botonRecoger){
             let zonaRecogida=document.getElementById("lista-recogida")
 
-            // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
+                // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
             botonRecoger.remove()
             zonaRecogida.appendChild(pedido)
 
