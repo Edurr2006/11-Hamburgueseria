@@ -271,7 +271,9 @@ summary {
             setTimeout(() => {
                 pedidosPreparacion.removeChild(nuevoPedido)
                 pedidosListos.appendChild(nuevoPedido)
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`
                 nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
+
                     clearInterval(actualizarPedido) // Si este setTimeout llega a cero limpia el setInterval 
             }, tiempoTotal * 1000)
         }
