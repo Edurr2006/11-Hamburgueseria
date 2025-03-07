@@ -4,136 +4,148 @@
     <meta charset="UTF-8">
     <title>Gestión de Pedidos</title>
     <style>
-        /*  Configuración general */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-        }
+/*  Configuración general */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
 
-        /*  Contenedor principal */
-        #container {
-            display: flex;  /* Usamos flexbox en lugar de grid */
-            justify-content: space-between;  /* Espacio entre las tres zonas */
-            padding: 20px;
-            height: 100vh;  /* Ocupar toda la pantalla */
-        }
+/*  Contenedor principal */
+#container {
+    display: flex;  /* Usamos flexbox en lugar de grid */
+    justify-content: space-between;  /* Espacio entre las tres zonas */
+    padding: 20px;
+    height: 100vh;  /* Ocupar toda la pantalla */
+}
 
-        /* Estilos generales de cada zona */
-        .zona {
-            background: #fff34fac;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-            width: 32%; /* Cada zona ocupa 32% del ancho */
-            overflow-y: auto; /* Permite desplazamiento si el contenido es grande */
-        }
+/* Estilos generales de cada zona */
+.zona {
+    background: rgba(255, 243, 79, 0.67); /* Amarillo claro con opacidad */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+    width: 32%; /* Cada zona ocupa 32% del ancho */
+    overflow-y: auto; /* Permite desplazamiento si el contenido es grande */
+}
 
-        /*  Títulos */
-        h2 {
-            text-align: center;
-            margin-bottom: 15px;
-            background-color: #f4f4f4;
-        }
+/*  Títulos */
+h2 {
+    text-align: center;
+    margin-bottom: 15px;
+    background-color: #f4f4f4;
+}
 
-        /* 5️ Listas de selección */
-        ul {
-            list-style: none;
-            padding: 0;
+/* Listas de selección */
+ul {
+    list-style: none;
+    padding: 0;
+}
 
-        }
+li {
+    margin: 5px 0;
+}
 
-        li {
-            margin: 5px 0;
-        }
+/* Checkbox y radio buttons */
+input[type="checkbox"], input[type="radio"] {
+    margin-right: 8px;
+}
 
-        /* Checkbox y radio buttons */
-        input[type="checkbox"], input[type="radio"] {
-            margin-right: 8px;
-        }
+/*  Campos de entrada y botones */
+select, input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 
-        /*  Campos de entrada y botones */
-        select, input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+/*  Botón de enviar pedido */
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #27aea5;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-        /*  Botón de enviar pedido */
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: #27aea5;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+button:hover {
+    background: rgba(33, 145, 138, 0.5);
+}
 
-        button:hover {
-            background: #21918a6a;
-        }
-        .productos {
-            display: flex;
-            justify-content: space-around;
-            margin: 15px 0;
-        }
+.productos {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+}
 
-        .producto {
-            cursor: pointer;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            padding: 5px;
-            text-align: center;
-            transition: transform 0.2s;
-           
-            
-        }
+.producto {
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    transition: transform 0.2s;
+}
 
-        .producto img {
-            width: 120px;
-            height: auto;
-            border-radius: 10px;
-        }
+.producto img {
+    width: 120px;
+    height: auto;
+    border-radius: 10px;
+}
 
-        .producto:active{
-            background-color: #ffef0a;
-        }
+.producto:active {
+    background-color: #ffef0a;
+}
 
+.producto:hover {
+    transform: scale(1.05);
+}
 
+/* Estilos de la cesta */
+.cesta {
+    width: fit-content;
+    margin: 10px auto;
+    cursor: pointer;
+    background-color: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
 
-        .producto:hover {
-            transform: scale(1.05);
-        }
-        .cesta {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            margin: 20px auto;
-            text-align: center;
-        }
-        .producto-cesta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .producto-cesta:last-child {
-            border-bottom: none;
-        }
+.cesta summary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        /* Estilos para el contenedor desplegable */
+.cesta img {
+    width: 50px; /* Ajusta el tamaño de la imagen de la cesta */
+    height: auto;
+}
+
+.producto-cesta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.producto-cesta:last-child {
+    border-bottom: none;
+}
+
+/* Estilos para el contenedor desplegable */
 .desplegable {
-    background: #21918a6a;
+    background: rgba(33, 145, 138, 0.5);
     padding: 10px;
     border-radius: 8px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
@@ -152,48 +164,53 @@ summary {
     align-items: center;
 }
 
-/* Cambia el cursor al pasar sobre el botón de despliegue */
-
-
-/* Estilos para la lista cuando se despliega */
+/* Cambia el fondo cuando se despliega */
 .desplegable[open] {
-    background: #fff34fac;
+    background: rgba(255, 243, 79, 0.67);
 }
 
-.cesta {
-        width: fit-content;
-        margin: 10px auto;
-        cursor: pointer;
-        background-color: white;
-        border-radius: 5px;
-    }
-
-    .cesta summary {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .cesta img {
-        width: 50px; /* Ajusta el tamaño de la imagen de la cesta */
-        height: auto;
-    }
-
-    .estado-pedido {
+/* Estado de los pedidos */
+.estado-pedido {
     font-weight: bold;
     font-size: 1.2em;
-    }
+}
 
-    .estado-pedido span {
+.estado-pedido span {
     display: block;
     margin: 5px 0;
-    }
+}
+.adicionales{
+    padding: 10px;
+    background: rgba(255, 243, 79, 0.67);
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+.adicionales ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+}
 
-    #pedidosConfirmados { color: green; }
-    #pedidosPreparacion { color: orange; }
-    #pedidosListos { color: blue; }
+.adicionales li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-   
+details[open] .adicionales {
+    display: block;
+}
+
+details .adicionales {
+    display: none;
+}
+
+#pedidosConfirmados { color: green; }
+#pedidosPreparacion { color: orange; }
+#pedidosListos { color: blue; }
+
     </style>
 
     <script type="text/javascript">
@@ -203,7 +220,7 @@ summary {
         function añadirPedido(){
             contador +=1
             let numeroPedido= contador
-
+            desmarcarTodosLosComplementos()
                 // Calcula la cantidad de PRODUCTOS PRINCIPALES que hay de cada uno
             let cantidadHamburguesas= productos["Hamburguesa"] ? productos["Hamburguesa"].cantidad: 0
             let cantidadPerritos= productos["Perrito Caliente"] ? productos["Perrito Caliente"].cantidad: 0
@@ -282,15 +299,15 @@ summary {
 
             // Función para confirmar la recogida de un pedido en la zona de recogida
         function recoger(pedido, botonRecoger){
-            let zonaRecogida=document.getElementById("lista-recogida")
+            let zonaRecogida = document.getElementById("lista-recogida")
 
                 // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
             botonRecoger.remove()
             zonaRecogida.appendChild(pedido)
 
-            let botonConfirmarRecogida= document.createElement("button")
-            botonConfirmarRecogida.textContent="Confirmar Recogida"
-            botonConfirmarRecogida.onclick=function(){
+            let botonConfirmarRecogida = document.createElement("button")
+            botonConfirmarRecogida.textContent = "Confirmar Recogida"
+            botonConfirmarRecogida.onclick = function(){
                 confirmarRecogida(pedido)
             }
             pedido.appendChild(botonConfirmarRecogida)
@@ -320,39 +337,68 @@ summary {
         }
 
 
-        let productos = {}; // Objeto para almacenar los productos agregados
-        var total = 0; // Variable para el total de la compra
+    let productos = {}; // Carrito de compras
+    let total = 0; // Total del pedido
+    let precioComplemento = 0.50; // Precio fijo de los complementos
 
-        function agregarcesta(nombre, precio) {
-            if (!productos[nombre]) {
-            productos[nombre] = { cantidad: 0, precioTotal: 0 }; // Inicializar si no existe
+    // Agregar un producto al carrito
+    let agregarcesta = (nombre, precio) => {
+        if (!productos[nombre]) {
+            productos[nombre] = { cantidad: 0, precioTotal: 0 };
         }
 
-        productos[nombre].cantidad += 1; // Incrementar la cantidad
-        productos[nombre].precioTotal += precio; // Incrementar el precio total
-
-        // Actualizar el total sumando el nuevo precio
+        productos[nombre].cantidad++;
+        productos[nombre].precioTotal += precio;
         total += precio;
 
-    // Actualizar la vista del carrito
-    actualizarCarrito();
-}
+        actualizarCarrito();
+    };
 
-// Función para actualizar el contenido del carrito
-function actualizarCarrito() {
-    let contenidoCarrito = "";
+    // Eliminar un producto del carrito
+    let eliminarDeCesta = (nombre, precio) => {
+        if (productos[nombre]) {
+            productos[nombre].cantidad--;
+            productos[nombre].precioTotal -= precio;
+            total -= precio;
+
+            if (productos[nombre].cantidad <= 0) {
+                delete productos[nombre]; // Eliminar si ya no queda
+            }
+
+            actualizarCarrito();
+        }
+    };
+
+    // Actualizar el carrito en pantalla
+    let actualizarCarrito = () => {
+        let contenidoCarrito = "";
+        
+        for (let producto in productos) {
+            contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal}€<br>`;
+        }
+
+        document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
+        document.getElementById("total").textContent = total.toFixed(2);
+    };
+
+    // Manejar el cambio en los checkboxes
+    let manejarCheckbox = (id, nombre) => {
+        let checkbox = document.getElementById(id);
+
+        if (checkbox.checked) {
+            agregarcesta(nombre, precioComplemento);
+        } else {
+            eliminarDeCesta(nombre, precioComplemento);
+        }
+        
+    };
+    //selecciono todas las checkbox y las desmarco
+    function desmarcarTodosLosComplementos(){
+            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false); // Desmarcar todos
+        }
+
     
-    for (let producto in productos) {
-        contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal.toFixed(2)}€<br>`;
-    }
-
-    document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
-    
-    // Mostrar el total en el HTML
-    document.getElementById("total").textContent = total.toFixed(2);
-}
-
-
  </script>
 </head>
 <body>
@@ -376,6 +422,19 @@ function actualizarCarrito() {
                     <p>Bocadillo - <br>4.00€</p>
                 </div>
             </div>
+            <details class="cesta">
+                <summary><img src="imagenes/adicionales.png" alt="cesta">Adicionales +(0.50€ c/u)</summary>
+                <div id="adicionales" class="adicionales">
+                    <ul>
+                        <li><input type="checkbox" id="bacon" onchange="manejarCheckbox('bacon', 'Bacon')"> Bacon</li>
+                        <li><input type="checkbox" id="cebolla" onchange="manejarCheckbox('cebolla', 'Cebolla caramelizada')"> Cebolla caramelizada</li>
+                        <li><input type="checkbox" id="huevo" onchange="manejarCheckbox('huevo', 'Huevo frito')"> Huevo frito</li>
+                        <li><input type="checkbox" id="champinones" onchange="manejarCheckbox('champinones', 'Champiñones')"> Champiñones</li>
+                        <li><input type="checkbox" id="jalapenos" onchange="manejarCheckbox('jalapenos', 'Jalapeños')"> Jalapeños</li>
+                        <li><input type="checkbox" id="mayonesa" onchange="manejarCheckbox('mayonesa', 'Mayonesa especial')"> Mayonesa especial</li>
+                    </ul>
+                </div>
+            </details>
     
             <h3>Complementos:</h3>
             <div class="productos">
