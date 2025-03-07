@@ -91,7 +91,9 @@
             border-radius: 10px;
             padding: 5px;
             text-align: center;
-            transition: transform 0.2s ease-in-out, border 0.3s;
+            transition: transform 0.2s;
+           
+            
         }
 
         .producto img {
@@ -100,10 +102,16 @@
             border-radius: 10px;
         }
 
+        .producto:active{
+            background-color: #ffef0a;
+        }
+
+
+
         .producto:hover {
             transform: scale(1.05);
         }
-.cesta {
+        .cesta {
             background: white;
             padding: 15px;
             border-radius: 10px;
@@ -170,6 +178,20 @@ summary {
         width: 50px; /* Ajusta el tamaño de la imagen de la cesta */
         height: auto;
     }
+
+    .estado-pedido {
+    font-weight: bold;
+    font-size: 1.2em;
+    }
+
+    .estado-pedido span {
+    display: block;
+    margin: 5px 0;
+    }
+
+    #pedidosConfirmados { color: green; }
+    #pedidosPreparacion { color: orange; }
+    #pedidosListos { color: blue; }
 
    
     </style>
@@ -334,7 +356,7 @@ function actualizarCarrito() {
     <div id="container">
         <!-- Zona de Pedido -->
         <div id="zona-pedido" class="zona">
-            <h2>Zona de Pedido</h2>
+            <h2>Crear Pedido</h2>
     
             <h3>Selecciona tu Producto:</h3>
             <div class="productos">
@@ -397,7 +419,7 @@ function actualizarCarrito() {
     
         <!-- Zona de Display -->
         <div id="zona-display" class="zona">
-            <h2>Zona de Display</h2>
+            <h2>Estado De Pedido</h2>
             <ul id="lista-pedidos">
                 <u><strong>CONFIRMADOS</strong></u>
                 <ul id="pedidosConfirmados"></ul>
