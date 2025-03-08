@@ -197,7 +197,8 @@ summary {
     </style>
 
     <script type="text/javascript">
-        var contador=0 // Contador para el número de pedido
+        var pedidos=[]
+        var contador = parseInt(localStorage.getItem("ultimoPedido")) || 0; // Contador para el número de pedido
 
             // Función para añadir un pedido a la zona de display
         function añadirPedido(){
@@ -246,60 +247,102 @@ summary {
 
                 // Variables para añadir los nuevos pedidos a la zona de display
             let nuevoPedido = document.createElement("li")
-            nuevoPedido.id = `pedido${contador}`
-            nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoVeUsuario} segundos`
-            pedidosConfirmados.appendChild(nuevoPedido)
+                nuevoPedido.id = `pedido${contador}`
+                nuevoPedido.textContent = `Pedido ${contador}. Tiempo restante: ${tiempoVeUsuario} segundos`
+                pedidosConfirmados.appendChild(nuevoPedido)
 
             let tiempoRestante= tiempoVeUsuario
+            let datosPedido = {
+                id: numeroPedido,
+                texto: `Pedido ${numeroPedido}. Tiempo restante: ${tiempoRestante} segundos`,
+                estado: "confirmado",
+                tiempoUsuario: tiempoRestante,
+                tiempoInterno: tiempoTotal,
+                tiempoInicio: Date.now(), // Añadimos el timestamp de inicio
+                tiempoTranscurrido: 0 
+        };
+
             let actualizarPedido= setInterval(() => {
                 tiempoRestante -=1
                 nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: ${(tiempoRestante)} segundos`
-
-                if(tiempoRestante <=0){
-                    clearInterval(actualizarPedido)
-                    nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: RETRASO de ${tiempoTotal - tiempoVeUsuario} segundos`
-                }
-            }, 1000);
-
-                // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
+                datosPedido.tiempoUsuario = tiempoRestante;
+                
+                // Detenemos el contador si el tiempo total se ha alcanzado o si el tiempo restante llega a 0
+        if (tiempoRestante <= 0 || (Date.now() - datosPedido.tiempoInicio) >= tiempoTotal * 1000) {
+            clearInterval(actualizarPedido);
+            if (tiempoRestante > 0) {
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`;
+            } else {
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: RETRASO de ${tiempoTotal - tiempoVeUsuario} segundos`;
+            }
+        }
+    }, 1000);
+            
+            // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
             setTimeout(() => {
                 pedidosConfirmados.removeChild(nuevoPedido) // Elimino el pedido de confirmados
                 pedidosPreparacion.appendChild(nuevoPedido) // Y lo añado a "en preparación"
-
+                
             }, tiempoTotal * 500) // Multiplico por 500 para que cuando quede la mitad del TIEMPO INTERNO pase de confirmados a en preparación
-
-                // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
+            
+            // SetTimeout para pasar de la zona de EN PREPARACIÓN a la de LISTO PARA RECOGER
             setTimeout(() => {
-                pedidosPreparacion.removeChild(nuevoPedido)
-                pedidosListos.appendChild(nuevoPedido)
-                nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`
-                nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
-
+                if (document.getElementById(nuevoPedido.id)) {  // Verificamos que el elemento existe
+                    pedidosPreparacion.removeChild(nuevoPedido)
+                    pedidosListos.appendChild(nuevoPedido)
+                    nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`
+                    nuevoPedido.appendChild(botonRecoger) // Añado el botonRecoger
                     clearInterval(actualizarPedido) // Si este setTimeout llega a cero limpia el setInterval 
+                }
+                
             }, tiempoTotal * 1000)
+
+            
+
+            pedidos.push(datosPedido)
+
+            guardarLocal()
         }
 
 
             // Función para confirmar la recogida de un pedido en la zona de recogida
-        function recoger(pedido, botonRecoger){
-            let zonaRecogida=document.getElementById("lista-recogida")
+            function recoger(pedido, botonRecoger){
+    let zonaRecogida = document.getElementById("lista-recogida");
 
-                // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
-            botonRecoger.remove()
-            zonaRecogida.appendChild(pedido)
+    // Obtener el ID del pedido y actualizar su estado
+    const idPedido = parseInt(pedido.id.replace('pedido', ''));
+    let pedidoActual = pedidos.find(p => p.id === idPedido);
+    if (pedidoActual) {
+        pedidoActual.estado = "recogida"; // Actualizamos el estado a "recogida"
+        guardarLocal(); // Guardamos el cambio en localStorage
+    }
 
-            let botonConfirmarRecogida= document.createElement("button")
-            botonConfirmarRecogida.textContent="Confirmar Recogida"
-            botonConfirmarRecogida.onclick=function(){
-                confirmarRecogida(pedido)
-            }
-            pedido.appendChild(botonConfirmarRecogida)
-        }
+    // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
+    botonRecoger.remove();
+    zonaRecogida.appendChild(pedido);
+
+    let botonConfirmarRecogida = document.createElement("button");
+    botonConfirmarRecogida.textContent = "Confirmar Recogida";
+    botonConfirmarRecogida.onclick = function(){
+        confirmarRecogida(pedido);
+    };
+    pedido.appendChild(botonConfirmarRecogida);
+}
 
 
             // Función que elimina un pedido cuando confirmamos su recogida
         function confirmarRecogida(pedido){
-            pedido.remove() // Eliminamos el pedido cuando confirmamos su recogida
+            // Obtener el ID del pedido
+            const idPedido = parseInt(pedido.id.replace('pedido', ''));
+            
+            // Eliminar el pedido del array
+            pedidos = pedidos.filter(p => p.id !== idPedido);
+            
+            // Actualizar localStorage
+            guardarLocal();
+            
+            // Eliminar el elemento del DOM
+            pedido.remove();
         }
 
 // Función para actualizar el total
@@ -352,6 +395,154 @@ function actualizarCarrito() {
     document.getElementById("total").textContent = total.toFixed(2);
 }
 
+
+
+
+    function guardarLocal(){
+        localStorage.setItem("pedidos" ,JSON.stringify(pedidos))
+        localStorage.setItem("ultimoPedido", contador);
+    }
+
+    function cargaLocal() {
+    pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+    contador = parseInt(localStorage.getItem("ultimoPedido")) || 0;
+    
+    pedidos.forEach((pedido) => {
+        let nuevoPedido = document.createElement("li");
+        nuevoPedido.id = `pedido${pedido.id}`;
+
+        const tiempoTranscurrido = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
+        const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurrido;
+
+        function crearBotonRecoger() {
+            let botonRecoger = document.createElement("button");
+            botonRecoger.textContent = "Recoger";
+            botonRecoger.onclick = function() {
+                recoger(nuevoPedido, botonRecoger);
+            };
+            return botonRecoger;
+        }
+
+        function moverAListos() {
+            const pedidoExistente = document.getElementById(nuevoPedido.id);
+            if (pedidoExistente && pedidoExistente.parentNode) {
+                pedidoExistente.parentNode.removeChild(pedidoExistente);
+            }
+            document.getElementById("pedidosListos").appendChild(nuevoPedido);
+            nuevoPedido.textContent = `Pedido ${pedido.id}. ¡Listo!`;
+            pedido.estado = "listo";
+            guardarLocal();
+            nuevoPedido.appendChild(crearBotonRecoger());
+        }
+
+        function moverAPreparacion() {
+    const pedidoExistente = document.getElementById(nuevoPedido.id);
+    if (pedidoExistente && pedidoExistente.parentNode) {
+        pedidoExistente.parentNode.removeChild(pedidoExistente);
+    }
+    document.getElementById("pedidosPreparacion").appendChild(nuevoPedido);
+    
+    let actualizarPreparacion = setInterval(() => {
+        if (!document.getElementById(nuevoPedido.id)) {
+            clearInterval(actualizarPreparacion);
+            return;
+        }
+
+        const tiempoTranscurridoTotal = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
+        const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurridoTotal;
+
+        // Actualizar el tiempo transcurrido periódicamente
+        pedido.tiempoTranscurrido = tiempoTranscurridoTotal;
+        guardarLocal();
+        
+        if (tiempoTranscurridoTotal >= pedido.tiempoInterno) {
+            clearInterval(actualizarPreparacion);
+            moverAListos();
+            return;
+        }
+
+        if (tiempoRestante <= 0) {
+            clearInterval(actualizarPreparacion);
+            const retraso = pedido.tiempoInterno - pedido.tiempoUsuario;
+            nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: RETRASO de ${retraso} segundos`;
+            
+            // Esperar el tiempo de retraso completo antes de mover a listos
+            const tiempoEspera = (pedido.tiempoInterno - tiempoTranscurridoTotal) * 1000;
+            setTimeout(() => moverAListos(), tiempoEspera);
+            return;
+        }
+
+        nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${tiempoRestante} segundos`;
+    }, 1000);
+}
+
+        // Determinar zona inicial y comportamiento
+        if (pedido.estado === "recogida") {
+            let zonaRecogida = document.getElementById("lista-recogida");
+            zonaRecogida.appendChild(nuevoPedido);
+            nuevoPedido.textContent = `Pedido ${pedido.id}. ¡Listo!`;
+            
+            let botonConfirmarRecogida = document.createElement("button");
+            botonConfirmarRecogida.textContent = "Confirmar Recogida";
+            botonConfirmarRecogida.onclick = function() {
+                confirmarRecogida(nuevoPedido);
+            };
+            nuevoPedido.appendChild(botonConfirmarRecogida);
+        } 
+        else if (pedido.estado === "listo" || tiempoTranscurrido >= pedido.tiempoInterno) {
+            moverAListos();
+        }
+        else if (tiempoTranscurrido >= pedido.tiempoInterno * 0.5) {
+            moverAPreparacion();
+            nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${tiempoRestante} segundos`;
+
+            const tiempoHastaFinal = pedido.tiempoInterno * 1000 - (Date.now() - pedido.tiempoInicio);
+            if (tiempoHastaFinal > 0) {
+                setTimeout(() => {
+                    if (document.getElementById(nuevoPedido.id)) {
+                        moverAListos();
+                    }
+                }, tiempoHastaFinal);
+            }
+        }
+        else {
+            document.getElementById("pedidosConfirmados").appendChild(nuevoPedido);
+            nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${tiempoRestante} segundos`;
+            
+            let actualizarPedido = setInterval(() => {
+                if (!document.getElementById(nuevoPedido.id)) {
+                    clearInterval(actualizarPedido);
+                    return;
+                }
+
+                const nuevoTiempoTranscurrido = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
+                const nuevoTiempoRestante = pedido.tiempoUsuario - nuevoTiempoTranscurrido;
+
+                if (nuevoTiempoRestante <= 0 || nuevoTiempoTranscurrido >= pedido.tiempoInterno * 0.5) {
+                    clearInterval(actualizarPedido);
+                    moverAPreparacion();
+                    if (nuevoTiempoRestante <= 0) {
+                        nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: RETRASO de ${pedido.tiempoInterno - pedido.tiempoUsuario} segundos`;
+                    }
+                    return;
+                }
+
+                nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${nuevoTiempoRestante} segundos`;
+            }, 1000);
+
+            const tiempoHastaPreparacion = (pedido.tiempoInterno * 0.5 * 1000) - (tiempoTranscurrido * 1000);
+            if (tiempoHastaPreparacion > 0) {
+                setTimeout(() => {
+                    if (document.getElementById(nuevoPedido.id)) {
+                        moverAPreparacion();
+                    }
+                }, tiempoHastaPreparacion);
+            }
+        }
+    });
+}
+
+window.onload=cargaLocal
 
  </script>
 </head>
