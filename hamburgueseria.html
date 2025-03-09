@@ -207,6 +207,82 @@ details .adicionales {
     display: none;
 }
 
+.cesta-contenido small {
+    color: #666;
+    font-size: 0.85em;
+    margin-left: 15px;
+}
+
+.cesta-contenido div {
+    border-bottom: 1px solid #eee;
+    padding: 5px 0;
+}
+
+/* Reemplaza los estilos existentes de ingredientes-base con estos: */
+.ingredientes-base {
+    flex: 1;
+    background: rgba(255, 243, 79, 0.67);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 0;
+}
+
+.ingredientes-base ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+}
+
+.ingredientes-base li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ingredientes-base h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    text-align: center;
+}
+
+.ingredientes-base input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+}
+
+.ingredientes-base label {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Estilo común para ambos contenedores */
+.personalizacion-container {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Estilos comunes para ingredientes base y adicionales */
+.ingredientes-base, .adicionales {
+    flex: 1;
+    background: rgba(255, 243, 79, 0.67);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+details[open] .personalizacion-container {
+    display: flex;
+}
+
+details .personalizacion-container {
+    display: none;
+}
 #pedidosConfirmados { color: green; }
 #pedidosPreparacion { color: orange; }
 #pedidosListos { color: blue; }
@@ -216,6 +292,24 @@ details .adicionales {
     <script type="text/javascript">
         var pedidos=[]
         var contador = parseInt(localStorage.getItem("ultimoPedido")) || 0; // Contador para el número de pedido
+        let productoSeleccionadoTemp = null;
+        const ingredientesBase = {
+            'Hamburguesa': ['Lechuga', 'Tomate', 'Queso'],
+            'Perrito Caliente': ['Cebolla', 'Ketchup', 'Mostaza'],
+            'Bocadillo': ['Jamón', 'Queso', 'Tomate']
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const detallesIngredientes = document.getElementById('detallesIngredientes');
+            
+            // Prevenir que se abra al hacer clic en el summary
+            detallesIngredientes.addEventListener('click', function(e) {
+                if (e.target.closest('summary')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
 
             // Función para añadir un pedido a la zona de display
         function añadirPedido(){
@@ -226,10 +320,23 @@ details .adicionales {
             contador +=1
             let numeroPedido= contador
             desmarcarTodosLosComplementos()
+
                 // Calcula la cantidad de PRODUCTOS PRINCIPALES que hay de cada uno
-            let cantidadHamburguesas= productos["Hamburguesa"] ? productos["Hamburguesa"].cantidad: 0
-            let cantidadPerritos= productos["Perrito Caliente"] ? productos["Perrito Caliente"].cantidad: 0
-            let cantidadBocadillos= productos["Bocadillo"] ? productos["Bocadillo"].cantidad: 0
+            let cantidadHamburguesas = 0;
+            let cantidadPerritos = 0;
+            let cantidadBocadillos = 0;
+
+            // Recorrer todos los productos en la cesta
+            for (let producto in productos) {
+                if (producto.startsWith('Hamburguesa')) {
+                    cantidadHamburguesas += productos[producto].cantidad;
+                } else if (producto.startsWith('Perrito Caliente')) {
+                    cantidadPerritos += productos[producto].cantidad;
+                } else if (producto.startsWith('Bocadillo')) {
+                    cantidadBocadillos += productos[producto].cantidad;
+                }
+            }
+
             let cantidadProductosPrincipales= cantidadHamburguesas + cantidadPerritos + cantidadBocadillos
 
                 // Aquí hago la SUMA TOTAL de productos principales que tengo y lo multiplico por 30 para calcular el tiempo
@@ -328,15 +435,15 @@ details .adicionales {
 
             // Función para confirmar la recogida de un pedido en la zona de recogida
             function recoger(pedido, botonRecoger){
-    let zonaRecogida = document.getElementById("lista-recogida");
+                let zonaRecogida = document.getElementById("lista-recogida");
 
-    // Obtener el ID del pedido y actualizar su estado
-    const idPedido = parseInt(pedido.id.replace('pedido', ''));
-    let pedidoActual = pedidos.find(p => p.id === idPedido);
-    if (pedidoActual) {
-        pedidoActual.estado = "recogida"; // Actualizamos el estado a "recogida"
-        guardarLocal(); // Guardamos el cambio en localStorage
-    }
+                // Obtener el ID del pedido y actualizar su estado
+                const idPedido = parseInt(pedido.id.replace('pedido', ''));
+                let pedidoActual = pedidos.find(p => p.id === idPedido);
+                if (pedidoActual) {
+                    pedidoActual.estado = "recogida"; // Actualizamos el estado a "recogida"
+                    guardarLocal(); // Guardamos el cambio en localStorage
+                }
 
     // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
     botonRecoger.remove();
@@ -364,6 +471,77 @@ details .adicionales {
             
             // Eliminar el elemento del DOM
             pedido.remove();
+        }
+
+
+        
+        function seleccionarProducto(nombre, precio) {
+            productoSeleccionadoTemp = {nombre, precio};
+            document.getElementById('detallesIngredientes').open = true;
+            
+            // Actualizar ingredientes base
+            const ingredientesDiv = document.getElementById('ingredientes-base');
+            if (ingredientesDiv) {
+                let html = `<h4>Ingredientes de ${nombre}:</h4><ul>`;
+                ingredientesBase[nombre].forEach(ingrediente => {
+                    html += `
+                        <li>
+                            <input type="checkbox" 
+                                id="base-${ingrediente.toLowerCase()}" 
+                                checked="checked" 
+                                data-ingrediente="${ingrediente}">
+                            <label for="base-${ingrediente.toLowerCase()}">${ingrediente}</label>
+                        </li>`;
+                });
+                html += '</ul>';
+                ingredientesDiv.innerHTML = html;
+            }
+            
+            desmarcarTodosLosComplementos();
+        }
+
+        function agregarProductoConAdicionales() {
+            if (productoSeleccionadoTemp) {
+                // Obtener ingredientes base no eliminados
+                let ingredientesSeleccionados = [];
+                let checkboxesBase = document.querySelectorAll('#ingredientes-base input[type="checkbox"]:checked');
+                checkboxesBase.forEach(checkbox => {
+                    ingredientesSeleccionados.push(checkbox.dataset.ingrediente);
+                });
+
+                // Obtener adicionales seleccionados
+                let adicionalesSeleccionados = [];
+                let checkboxesAdicionales = document.querySelectorAll('#adicionales input[type="checkbox"]:checked');
+                checkboxesAdicionales.forEach(checkbox => {
+                    adicionalesSeleccionados.push(checkbox.nextElementSibling.textContent);
+                });
+
+                // Crear el nombre del producto con sus especificaciones
+                let nombreCompleto = productoSeleccionadoTemp.nombre;
+                
+                // Añadir ingredientes quitados
+                let ingredientesQuitados = ingredientesBase[productoSeleccionadoTemp.nombre]
+                    .filter(ing => !ingredientesSeleccionados.includes(ing));
+                if (ingredientesQuitados.length > 0) {
+                    nombreCompleto += ' sin ' + ingredientesQuitados.join(', ');
+                }
+                
+                // Añadir ingredientes adicionales
+                if (adicionalesSeleccionados.length > 0) {
+                    nombreCompleto += ' con ' + adicionalesSeleccionados.join(', ');
+                }
+
+                // Calcular precio total
+                let precioTotal = productoSeleccionadoTemp.precio + (adicionalesSeleccionados.length * precioComplemento);
+
+                // Agregar a la cesta
+                agregarcesta(nombreCompleto, precioTotal);
+                
+                // Limpiar selección
+                document.querySelector('.cesta').open = false;
+                productoSeleccionadoTemp = null;
+                desmarcarTodosLosComplementos();
+            }
         }
 
 // Función para actualizar el total
@@ -416,43 +594,61 @@ details .adicionales {
         }
     };
 
-    // Actualizar el carrito en pantalla
+        // Actualizar el carrito en pantalla
     let actualizarCarrito = () => {
-            let contenidoCarrito = "";
-            
-            for (let producto in productos) {
-                contenidoCarrito += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
-                        <span>${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal.toFixed(2)}€</span>
-                        <button onclick="eliminarDeCesta('${producto}', ${productos[producto].precioTotal/productos[producto].cantidad})" 
-                                style="padding: 2px 8px; width: 25px; background-color: #ff4444; color: white; border: none; 
-                                    border-radius: 3px; cursor: pointer; margin-left: 10px;">
-                            X
-                        </button>
-                    </div>`;
+        let contenidoCarrito = "";
+        
+        for (let producto in productos) {
+            // Separar el nombre base del producto y el resto
+            let [nombreBase, ...resto] = producto.split(' sin ');
+            let ingredientesQuitados = '';
+            let adicionalesText = '';
+
+            // Procesar los ingredientes quitados y adicionales
+            if (resto.length > 0) {
+                let partes = resto[0].split(' con ');
+                if (partes[0]) {
+                    ingredientesQuitados = `<br><small>sin ${partes[0]}</small>`;
+                }
+                if (partes[1]) {
+                    adicionalesText = `<br><small>con ${partes[1]}</small>`;
+                }
+            } else if (producto.includes(' con ')) {
+                // Si no hay ingredientes quitados pero sí adicionales
+                nombreBase = producto.split(' con ')[0]; // Solo el nombre del producto
+                let adicionales = producto.split(' con ')[1];
+                adicionalesText = `<br><small>con ${adicionales}</small>`;
             }
+            
+            contenidoCarrito += `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin: 5px 0;">
+                    <span>${productos[producto].cantidad} x ${nombreBase}${ingredientesQuitados}${adicionalesText} - ${productos[producto].precioTotal.toFixed(2)}€</span>
+                    <button onclick="eliminarDeCesta('${producto}', ${productos[producto].precioTotal/productos[producto].cantidad})" 
+                            style="padding: 2px 8px; width: 25px; background-color: #ff4444; color: white; border: none; 
+                                border-radius: 3px; cursor: pointer; margin-left: 10px;">
+                        X
+                    </button>
+                </div>`;
+        }
 
         document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
         document.getElementById("total").textContent = total.toFixed(2);
     };
 
-    // Manejar el cambio en los checkboxes
-    let manejarCheckbox = (id, nombre) => {
+            // Manejar el cambio en los checkboxes
+        let manejarCheckbox = (id, nombre) => {
+        // Esta función ahora solo manejará el estado del checkbox
+        // sin añadir nada a la cesta
         let checkbox = document.getElementById(id);
-
-        if (checkbox.checked) {
-            agregarcesta(nombre, precioComplemento);
-        } else {
-            eliminarDeCesta(nombre, precioComplemento);
-        }
+        // No necesitamos hacer nada más aquí
         
     };
-    //selecciono todas las checkbox y las desmarco
-    function desmarcarTodosLosComplementos(){
-            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => checkbox.checked = false); // Desmarcar todos
-        }
 
+        //selecciono todas las checkbox y las desmarco
+        function desmarcarTodosLosComplementos(){
+            let checkboxes = document.querySelectorAll('#adicionales input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false); // Desmarcar solo los adicionales
+        }
 
 
 
@@ -613,29 +809,35 @@ window.onload=cargaLocal
             <h3>Selecciona tu Producto:</h3>
             <div class="productos">
                 <div class="producto">
-                    <img src="imagenes/hamburguesa.png" alt="Hamburguesa" onclick="agregarcesta('Hamburguesa',5.00)">
+                    <img src="imagenes/hamburguesa.png" alt="Hamburguesa" onclick="seleccionarProducto('Hamburguesa',5.00)">
                     <p>Hamburguesa - 5.00€</p>
                 </div>
                 <div class="producto">
-                    <img src="imagenes/perrito.png" alt="Perrito Caliente" onclick="agregarcesta('Perrito Caliente',3.50)">
+                    <img src="imagenes/perrito.png" alt="Perrito Caliente" onclick="seleccionarProducto('Perrito Caliente',3.50)">
                     <p>Perrito Caliente - 3.50€</p>
                 </div>
                 <div class="producto">
-                    <img src="imagenes/bocadillo.png" alt="Bocadillo" onclick="agregarcesta('Bocadillo',4.00)">
+                    <img src="imagenes/bocadillo.png" alt="Bocadillo" onclick="seleccionarProducto('Bocadillo',4.00)">
                     <p>Bocadillo - <br>4.00€</p>
                 </div>
             </div>
-            <details class="cesta">
-                <summary><img src="imagenes/adicionales.png" alt="cesta">Adicionales +(0.50€ c/u)</summary>
+            <details class="cesta" id="detallesIngredientes">
+                <summary><img src="imagenes/adicionales.png" alt="cesta">Ingredientes</summary>
+                <div id="ingredientes-base" class="ingredientes-base">
+                    <!-- Aquí salen los ingredientes -->
+                </div>
+
                 <div id="adicionales" class="adicionales">
+                    <h4>Ingredientes adicionales (+0,50€)</h4>
                     <ul>
-                        <li><input type="checkbox" id="bacon" onchange="manejarCheckbox('bacon', 'Bacon')"> Bacon</li>
-                        <li><input type="checkbox" id="cebolla" onchange="manejarCheckbox('cebolla', 'Cebolla caramelizada')"> Cebolla caramelizada</li>
-                        <li><input type="checkbox" id="huevo" onchange="manejarCheckbox('huevo', 'Huevo frito')"> Huevo frito</li>
-                        <li><input type="checkbox" id="champinones" onchange="manejarCheckbox('champinones', 'Champiñones')"> Champiñones</li>
-                        <li><input type="checkbox" id="jalapenos" onchange="manejarCheckbox('jalapenos', 'Jalapeños')"> Jalapeños</li>
-                        <li><input type="checkbox" id="mayonesa" onchange="manejarCheckbox('mayonesa', 'Mayonesa especial')"> Mayonesa especial</li>
+                        <li><input type="checkbox" id="bacon"> <label for="bacon">Bacon</label></li>
+                        <li><input type="checkbox" id="cebolla"> <label for="cebolla">Cebolla caramelizada</label></li>
+                        <li><input type="checkbox" id="huevo"> <label for="huevo">Huevo frito</label></li>
+                        <li><input type="checkbox" id="champinones"> <label for="champinones">Champiñones</label></li>
+                        <li><input type="checkbox" id="jalapenos"> <label for="jalapenos">Jalapeños</label></li>
+                        <li><input type="checkbox" id="mayonesa"> <label for="mayonesa">Mayonesa especial</label></li>
                     </ul>
+                    <button onclick="agregarProductoConAdicionales()" class="btn">Añadir a la cesta</button>
                 </div>
             </details>
     
