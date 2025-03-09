@@ -285,15 +285,15 @@ details .adicionales {
                 datosPedido.tiempoUsuario = tiempoRestante;
                 
                 // Detenemos el contador si el tiempo total se ha alcanzado o si el tiempo restante llega a 0
-            if (tiempoRestante <= 0 || (Date.now() - datosPedido.tiempoInicio) >= tiempoTotal * 1000) {
-                clearInterval(actualizarPedido);
-                if (tiempoRestante > 0) {
-                    nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`;
-                } else {
-                    nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: RETRASO de ${tiempoTotal - tiempoVeUsuario} segundos`;
-                }
+        if (tiempoRestante <= 0 || (Date.now() - datosPedido.tiempoInicio) >= tiempoTotal * 1000) {
+            clearInterval(actualizarPedido);
+            if (tiempoRestante > 0) {
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. ¡Listo!`;
+            } else {
+                nuevoPedido.textContent = `Pedido ${numeroPedido}. Tiempo restante: RETRASO de ${tiempoTotal - tiempoVeUsuario} segundos`;
             }
-            }, 1000);
+        }
+    }, 1000);
             
             // SetTimeout para pasar de la zona de CONFIRMADOS a la zona de EN PREPARACIÓN
             setTimeout(() => {
@@ -314,35 +314,37 @@ details .adicionales {
                 
             }, tiempoTotal * 1000)
 
+            
+
             pedidos.push(datosPedido)
+
             guardarLocal()
         }
 
 
             // Función para confirmar la recogida de un pedido en la zona de recogida
-        function recoger(pedido, botonRecoger){
-            let zonaRecogida = document.getElementById("lista-recogida");
+            function recoger(pedido, botonRecoger){
+    let zonaRecogida = document.getElementById("lista-recogida");
 
-                // Obtener el ID del pedido y actualizar su estado
-            const idPedido = parseInt(pedido.id.replace('pedido', ''));
-            let pedidoActual = pedidos.find(p => p.id === idPedido);
+    // Obtener el ID del pedido y actualizar su estado
+    const idPedido = parseInt(pedido.id.replace('pedido', ''));
+    let pedidoActual = pedidos.find(p => p.id === idPedido);
+    if (pedidoActual) {
+        pedidoActual.estado = "recogida"; // Actualizamos el estado a "recogida"
+        guardarLocal(); // Guardamos el cambio en localStorage
+    }
 
-            if (pedidoActual) {
-                pedidoActual.estado = "recogida"; // Actualizamos el estado a "recogida"
-                guardarLocal(); // Guardamos el cambio en localStorage
-            }
+    // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
+    botonRecoger.remove();
+    zonaRecogida.appendChild(pedido);
 
-                // Eliminamos el BOTON RECOGER y creamos un nuevo botón llamado CONFIRMAR RECOGIDA
-            botonRecoger.remove();
-            zonaRecogida.appendChild(pedido);
-
-            let botonConfirmarRecogida = document.createElement("button");
-            botonConfirmarRecogida.textContent = "Confirmar Recogida";
-            botonConfirmarRecogida.onclick = function(){
-                confirmarRecogida(pedido);
-            };
-            pedido.appendChild(botonConfirmarRecogida);
-        }
+    let botonConfirmarRecogida = document.createElement("button");
+    botonConfirmarRecogida.textContent = "Confirmar Recogida";
+    botonConfirmarRecogida.onclick = function(){
+        confirmarRecogida(pedido);
+    };
+    pedido.appendChild(botonConfirmarRecogida);
+}
 
 
             // Función que elimina un pedido cuando confirmamos su recogida
@@ -360,11 +362,11 @@ details .adicionales {
             pedido.remove();
         }
 
-            // Función para actualizar el total
+// Función para actualizar el total
         function actualizarTotal() {
         var total = precioBase + precioBebida + precioComplemento;
         document.getElementById("total").textContent = total.toFixed(2) + "€";
-        }
+}
 
 
 
@@ -378,94 +380,101 @@ details .adicionales {
         }
 
 
-        let productos = {}; // Carrito de compras
-        let total = 0; // Total del pedido
-        let precioComplemento = 0.50; // Precio fijo de los complementos
+    let productos = {}; // Carrito de compras
+    let total = 0; // Total del pedido
+    let precioComplemento = 0.50; // Precio fijo de los complementos
 
-            // Agregar un producto al carrito
-        let agregarcesta = (nombre, precio) => {
-            if (!productos[nombre]) {
-                productos[nombre] = { cantidad: 0, precioTotal: 0 };
+    // Agregar un producto al carrito
+    let agregarcesta = (nombre, precio) => {
+        if (!productos[nombre]) {
+            productos[nombre] = { cantidad: 0, precioTotal: 0 };
+        }
+
+        productos[nombre].cantidad++;
+        productos[nombre].precioTotal += precio;
+        total += precio;
+
+        actualizarCarrito();
+    };
+
+    // Eliminar un producto del carrito
+    let eliminarDeCesta = (nombre, precio) => {
+        if (productos[nombre]) {
+            productos[nombre].cantidad--;
+            productos[nombre].precioTotal -= precio;
+            total -= precio;
+
+            if (productos[nombre].cantidad <= 0) {
+                delete productos[nombre]; // Eliminar si ya no queda
             }
-
-            productos[nombre].cantidad++;
-            productos[nombre].precioTotal += precio;
-            total += precio;
 
             actualizarCarrito();
-        };
+        }
+    };
 
-        // Eliminar un producto del carrito
-        let eliminarDeCesta = (nombre, precio) => {
-            if (productos[nombre]) {
-                productos[nombre].cantidad--;
-                productos[nombre].precioTotal -= precio;
-                total -= precio;
-
-                if (productos[nombre].cantidad <= 0) {
-                    delete productos[nombre]; // Eliminar si ya no queda
-                }
-
-                actualizarCarrito();
-            }
-        };
-
-            // Actualizar el carrito en pantalla
-        let actualizarCarrito = () => {
+    // Actualizar el carrito en pantalla
+    let actualizarCarrito = () => {
             let contenidoCarrito = "";
             
             for (let producto in productos) {
-                contenidoCarrito += `${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal}€<br>`;
+                contenidoCarrito += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+                        <span>${productos[producto].cantidad} x ${producto} - ${productos[producto].precioTotal.toFixed(2)}€</span>
+                        <button onclick="eliminarDeCesta('${producto}', ${productos[producto].precioTotal/productos[producto].cantidad})" 
+                                style="padding: 2px 8px; width: 25px; background-color: #ff4444; color: white; border: none; 
+                                    border-radius: 3px; cursor: pointer; margin-left: 10px;">
+                            X
+                        </button>
+                    </div>`;
             }
 
-            document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
-            document.getElementById("total").textContent = total.toFixed(2);
-        };
+        document.getElementById("cestacontenido").innerHTML = contenidoCarrito;
+        document.getElementById("total").textContent = total.toFixed(2);
+    };
 
-            // Manejar el cambio en los checkboxes
-        let manejarCheckbox = (id, nombre) => {
-            let checkbox = document.getElementById(id);
+    // Manejar el cambio en los checkboxes
+    let manejarCheckbox = (id, nombre) => {
+        let checkbox = document.getElementById(id);
 
-            if (checkbox.checked) {
-                agregarcesta(nombre, precioComplemento);
-            } else {
-                eliminarDeCesta(nombre, precioComplemento);
-            }
-            
-        };
-
-            //selecciono todas las checkbox y las desmarco
-        function desmarcarTodosLosComplementos(){
-                let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                checkboxes.forEach(checkbox => checkbox.checked = false); // Desmarcar todos
+        if (checkbox.checked) {
+            agregarcesta(nombre, precioComplemento);
+        } else {
+            eliminarDeCesta(nombre, precioComplemento);
+        }
+        
+    };
+    //selecciono todas las checkbox y las desmarco
+    function desmarcarTodosLosComplementos(){
+            let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false); // Desmarcar todos
         }
 
 
 
 
-        function guardarLocal(){
-            localStorage.setItem("pedidos" ,JSON.stringify(pedidos))
-            localStorage.setItem("ultimoPedido", contador);
-        }
+    function guardarLocal(){
+        localStorage.setItem("pedidos" ,JSON.stringify(pedidos))
+        localStorage.setItem("ultimoPedido", contador);
+    }
 
-        function cargaLocal() {
-            pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
-            contador = parseInt(localStorage.getItem("ultimoPedido")) || 0;
-            
-            pedidos.forEach((pedido) => {
-                let nuevoPedido = document.createElement("li");
-                nuevoPedido.id = `pedido${pedido.id}`;
+    function cargaLocal() {
+    pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+    contador = parseInt(localStorage.getItem("ultimoPedido")) || 0;
+    
+    pedidos.forEach((pedido) => {
+        let nuevoPedido = document.createElement("li");
+        nuevoPedido.id = `pedido${pedido.id}`;
 
-                const tiempoTranscurrido = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
-                const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurrido;
+        const tiempoTranscurrido = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
+        const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurrido;
 
-                function crearBotonRecoger() {
-                    let botonRecoger = document.createElement("button");
-                    botonRecoger.textContent = "Recoger";
-                    botonRecoger.onclick = function() {
-                        recoger(nuevoPedido, botonRecoger);
-                    };
-                    return botonRecoger;
+        function crearBotonRecoger() {
+            let botonRecoger = document.createElement("button");
+            botonRecoger.textContent = "Recoger";
+            botonRecoger.onclick = function() {
+                recoger(nuevoPedido, botonRecoger);
+            };
+            return botonRecoger;
         }
 
         function moverAListos() {
@@ -481,47 +490,47 @@ details .adicionales {
         }
 
         function moverAPreparacion() {
-            const pedidoExistente = document.getElementById(nuevoPedido.id);
-            if (pedidoExistente && pedidoExistente.parentNode) {
-                pedidoExistente.parentNode.removeChild(pedidoExistente);
-            }
-            document.getElementById("pedidosPreparacion").appendChild(nuevoPedido);
-            
-            let actualizarPreparacion = setInterval(() => {
-                if (!document.getElementById(nuevoPedido.id)) {
-                    clearInterval(actualizarPreparacion);
-                    return;
+    const pedidoExistente = document.getElementById(nuevoPedido.id);
+    if (pedidoExistente && pedidoExistente.parentNode) {
+        pedidoExistente.parentNode.removeChild(pedidoExistente);
+    }
+    document.getElementById("pedidosPreparacion").appendChild(nuevoPedido);
+    
+    let actualizarPreparacion = setInterval(() => {
+        if (!document.getElementById(nuevoPedido.id)) {
+            clearInterval(actualizarPreparacion);
+            return;
         }
 
-            const tiempoTranscurridoTotal = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
-            const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurridoTotal;
+        const tiempoTranscurridoTotal = Math.floor((Date.now() - pedido.tiempoInicio) / 1000);
+        const tiempoRestante = pedido.tiempoUsuario - tiempoTranscurridoTotal;
 
-                // Actualizar el tiempo transcurrido periódicamente
-            pedido.tiempoTranscurrido = tiempoTranscurridoTotal;
-            guardarLocal();
-            
-            if (tiempoTranscurridoTotal >= pedido.tiempoInterno) {
-                clearInterval(actualizarPreparacion);
-                moverAListos();
-                return;
-            }
-
-            if (tiempoRestante <= 0) {
-                clearInterval(actualizarPreparacion);
-                const retraso = pedido.tiempoInterno - pedido.tiempoUsuario;
-                nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: RETRASO de ${retraso} segundos`;
-                
-                // Esperar el tiempo de retraso completo antes de mover a listos
-                const tiempoEspera = (pedido.tiempoInterno - tiempoTranscurridoTotal) * 1000;
-                setTimeout(() => moverAListos(), tiempoEspera);
-                return;
-            }
-
-            nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${tiempoRestante} segundos`;
-            }, 1000);
+        // Actualizar el tiempo transcurrido periódicamente
+        pedido.tiempoTranscurrido = tiempoTranscurridoTotal;
+        guardarLocal();
+        
+        if (tiempoTranscurridoTotal >= pedido.tiempoInterno) {
+            clearInterval(actualizarPreparacion);
+            moverAListos();
+            return;
         }
 
-            // Determinar zona inicial y comportamiento
+        if (tiempoRestante <= 0) {
+            clearInterval(actualizarPreparacion);
+            const retraso = pedido.tiempoInterno - pedido.tiempoUsuario;
+            nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: RETRASO de ${retraso} segundos`;
+            
+            // Esperar el tiempo de retraso completo antes de mover a listos
+            const tiempoEspera = (pedido.tiempoInterno - tiempoTranscurridoTotal) * 1000;
+            setTimeout(() => moverAListos(), tiempoEspera);
+            return;
+        }
+
+        nuevoPedido.textContent = `Pedido ${pedido.id}. Tiempo restante: ${tiempoRestante} segundos`;
+    }, 1000);
+}
+
+        // Determinar zona inicial y comportamiento
         if (pedido.estado === "recogida") {
             let zonaRecogida = document.getElementById("lista-recogida");
             zonaRecogida.appendChild(nuevoPedido);
