@@ -219,6 +219,10 @@ details .adicionales {
 
             // Función para añadir un pedido a la zona de display
         function añadirPedido(){
+            if (total==0){
+                return
+            }
+            
             contador +=1
             let numeroPedido= contador
             desmarcarTodosLosComplementos()
