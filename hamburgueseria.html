@@ -100,13 +100,26 @@ button:hover {
     border-radius: 10px;
 }
 
+.producto {
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Estado cuando el ratón pasa por encima */
+.producto:hover {
+    transform: scale(1.05);
+    background-color: #f04912;
+}
+
+/* Estado cuando se hace clic */
 .producto:active {
     background-color: #ffef0a;
 }
 
-.producto:hover {
-    transform: scale(1.05);
+/* Estado cuando se hace clic y está en hover (opcional para más control) */
+.producto:hover:active {
+    background-color: #ffef0a;
 }
+
 
 /* Estilos de la cesta */
 .cesta {
